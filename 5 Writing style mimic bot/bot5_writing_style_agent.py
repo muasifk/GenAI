@@ -42,39 +42,30 @@ class AcademicStyleTransformer:
         # Get all PDF files from the data folder
         import glob
         pdf_files = glob.glob(os.path.join(data_folder, "*.pdf"))
-        
         if not pdf_files:
             print(f"No PDF files found in '{data_folder}' folder!")
             return
-            
         print(f"Found {len(pdf_files)} PDF files")
         
         all_chunks = []
         all_texts = []
-        
         for pdf_path in pdf_files:
             print(f"Processing: {os.path.basename(pdf_path)}")
-            
             try:
                 # Load PDF
                 loader = PyPDFLoader(pdf_path)
-                documents = loader.load()
-                
+                documents = loader.load() 
                 # Extract text
                 full_text = " ".join([doc.page_content for doc in documents])
                 all_texts.append(full_text)
-                
                 # Split into chunks for style reference
                 chunks = self.text_splitter.split_text(full_text)
                 all_chunks.extend(chunks)
-                
             except Exception as e:
                 print(f"Error processing {pdf_path}: {e}")
                 continue
-        
         # Store chunks in vector database for style matching
         embeddings = [self.embedding_model.encode(chunk) for chunk in all_chunks]
-        
         self.collection.add(
             documents=all_chunks,
             embeddings=embeddings,
@@ -84,72 +75,67 @@ class AcademicStyleTransformer:
         # Keep best style examples
         self.style_examples = all_texts[:5]  # Top 5 papers as style references
         self.is_trained = True
-        
         print(f"Training complete! Learned style from {len(pdf_files)} papers")
-        
+
+
+
     def find_similar_style_examples(self, input_text, n_examples=2):
         """Find style examples similar to input text topic"""
         if not self.is_trained:
             return []
-            
         input_embedding = self.embedding_model.encode(input_text)
-        
         results = self.collection.query(
             query_embeddings=[input_embedding.tolist()],
             n_results=n_examples
         )
-        
         return results['documents'][0] if results['documents'] else []
     
+
+
     def transform_text(self, input_text):
         """Transform input text to academic style"""
         if not self.is_trained:
             return "Error: Please train the transformer on research papers first."
-        
         # Find similar style examples
         similar_examples = self.find_similar_style_examples(input_text)
-        
         # Use general style examples if no similar ones found
         style_reference = similar_examples[0] if similar_examples else self.style_examples[0]
-        
         # Create transformation prompt
-        prompt = f"""
-Transform the following text to match the academic writing style of research papers.
+        prompt = f"""Transform the following text to match the academic writing style of research papers.
 
-STYLE REFERENCE (match this writing style):
-{style_reference[:800]}
+        STYLE REFERENCE (match this writing style):
+        {style_reference[:800]}
 
-INPUT TEXT TO TRANSFORM:
-{input_text}
+        INPUT TEXT TO TRANSFORM:
+        {input_text}
 
-TRANSFORMATION GUIDELINES:
-1. Use formal academic tone and vocabulary
-2. Replace casual language with scholarly expressions
-3. Add hedging language ("may suggest", "appears to", "potentially indicates")
-4. Use more complex sentence structures
-5. Include precise, technical terminology where appropriate
-6. Maintain the original meaning and content
-7. Structure arguments more formally
-8. Use passive voice where suitable for academic writing
+        TRANSFORMATION GUIDELINES:
+        1. Use formal academic tone and vocabulary
+        2. Replace casual language with scholarly expressions
+        3. Add hedging language ("may suggest", "appears to", "potentially indicates")
+        4. Use more complex sentence structures
+        5. Include precise, technical terminology where appropriate
+        6. Maintain the original meaning and content
+        7. Structure arguments more formally
+        8. Use passive voice where suitable for academic writing
 
-TRANSFORMED TEXT:
-"""
-        
+        TRANSFORMED TEXT:
+        """
         response = self.gemini_client.models.generate_content(
             model='gemini-2.0-flash-exp',
             contents=prompt
-        )
+            )
         return response.text
     
+
+
     def batch_transform(self, text_list):
         """Transform multiple texts at once"""
         transformed_texts = []
-        
         for i, text in enumerate(text_list):
             print(f"Transforming text {i+1}/{len(text_list)}...")
             transformed = self.transform_text(text)
-            transformed_texts.append(transformed)
-            
+            transformed_texts.append(transformed) 
         return transformed_texts
 
 
@@ -218,40 +204,54 @@ def main():
         except Exception as e:
             print(f"Error: {e}")
 
-# Simple API-like usage
-class StyleTransformerAPI:
-    def __init__(self, data_folder="data"):
-        self.transformer = AcademicStyleTransformer()
-        self.transformer.train_on_papers(data_folder)
+
+
+
+##### Or without main
+# transformer = AcademicStyleTransformer()
+# transformer.train_on_papers("data")
+# result = transformer.transform_text("Your text here")
+# print(result)
+
+
+# Simple API-like usage (Simplified wrapper)
+# class StyleTransformerAPI:
+#     def __init__(self, data_folder="data"):
+#         self.transformer = AcademicStyleTransformer()
+#         self.transformer.train_on_papers(data_folder)
     
-    def transform(self, text):
-        """Simple transform method"""
-        return self.transformer.transform_text(text)
+#     def transform(self, text):
+#         """Simple transform method"""
+#         return self.transformer.transform_text(text)
     
-    def transform_multiple(self, texts):
-        """Transform list of texts"""
-        return self.transformer.batch_transform(texts)
+#     def transform_multiple(self, texts):
+#         """Transform list of texts"""
+#         return self.transformer.batch_transform(texts)
+
+
 
 # Example usage of the API
-def api_example():
-    # Initialize with papers from data folder
-    api = StyleTransformerAPI("data")
+# def api_example():
+#     # Initialize with papers from data folder
+#     api = StyleTransformerAPI("data")
     
-    # Transform single text
-    result = api.transform("This method works really well for our problem.")
-    print(result)
+#     # Transform single text
+#     result = api.transform("This method works really well for our problem.")
+#     print(result)
     
-    # Transform multiple texts
-    texts = [
-        "The results look good.",
-        "We found some interesting patterns.",
-        "This approach might be useful."
-    ]
+#     # Transform multiple texts
+#     texts = [
+#         "The results look good.",
+#         "We found some interesting patterns.",
+#         "This approach might be useful."
+#     ]
     
-    results = api.transform_multiple(texts)
-    for original, transformed in zip(texts, results):
-        print(f"Original: {original}")
-        print(f"Transformed: {transformed}\n")
+#     results = api.transform_multiple(texts)
+#     for original, transformed in zip(texts, results):
+#         print(f"Original: {original}")
+#         print(f"Transformed: {transformed}\n")
+
+
 
 if __name__ == "__main__":
     main()
