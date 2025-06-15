@@ -4,7 +4,7 @@ import json
 from google.genai.types import Tool, FunctionDeclaration, Part
 from geopy.geocoders import Nominatim
 geolocator = Nominatim(user_agent="weather-app") 
-##  https://github.com/philschmid/gemini-samples/blob/main/guides/function-calling.ipynb
+
 
 
 

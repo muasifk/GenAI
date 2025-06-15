@@ -1,4 +1,4 @@
-### https://github.com/nathalyAlarconT/GenAI_Workshops/blob/main/FunctionCalling.ipynb
+
 
 from dotenv import load_dotenv
 import os
