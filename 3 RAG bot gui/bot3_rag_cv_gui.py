@@ -23,11 +23,13 @@ import fitz  # PyMuPDF
 from sentence_transformers import SentenceTransformer
 import faiss
 import gradio as gr
+from dotenv import load_dotenv
 
 DATA_DIR = "data"
 EMBED_MODEL = SentenceTransformer('all-MiniLM-L6-v2')
-# genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-genai.configure(api_key='AIzaSyAleN4-54MRBgwpV-yzRONbnQR9D4X_dX0')
+api_key = os.getenv('GOOGLE_API_KEY')
+load_dotenv('../keys.env')  # Load environment variables from .env file
+genai.configure(api_key=api_key)
 gemini = genai.GenerativeModel('gemini-2.0-flash-lite')
 
 
