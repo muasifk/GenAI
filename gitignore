@@ -1,0 +1,4 @@
+
+# Add files or patterns to ignore in git.add
+keys.env
+commands.txt

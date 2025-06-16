@@ -14,7 +14,9 @@
 
 # Run ollama in CMD
 # >> ollama run qwen3:0.6b
-
+# >> ollama run deepseek-r1:1.5b
+# >> ollama run llama3.2:1b
+# >> ollama run falcon3:1b
 
 ##############################################################
 # The chat assistance using "ollama.chat" method
@@ -22,7 +24,13 @@
 import ollama
 from ollama import chat
 
-model_name = 'qwen3:0.6b'
+## Choose model
+# model_name = 'qwen3:0.6b'
+model_name = 'deepseek-r1:1.5b'
+# model_name = 'llama3.2:1b'
+# model_name = 'falcon3:1b'
+# model_name = 'granite3.1-moe:1b'
+# model_name = 'falcon3:1b'
 
 
 
