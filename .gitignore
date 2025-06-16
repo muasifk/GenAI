@@ -2,3 +2,5 @@
 # Add files or patterns to ignore in git.add
 keys.env
 commands.txt
+# the .gitignore file itself (not recommended)
+.gitignore 
