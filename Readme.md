@@ -1,5 +1,5 @@
 # LLMWorkshop
-![Banner](banner.jpg)
+![Banner](banner1.jpg)
 
 This workshop contains a curated collection of tutorials/projects with complete code for experimenting with Large Language Models (LLMs). This repository serves as a practical learning resource for understanding, using, and deploying LLMs with modern tools and frameworks.
 
